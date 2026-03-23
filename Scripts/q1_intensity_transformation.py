@@ -1,66 +1,65 @@
-#258799R Q1: Intensity Transformation
-
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-# 1. Coordinate points from the graph in Fig 1a
-input_values =  [0, 100, 150, 255]
-output_values = [0,  50, 200, 255]
-
-def solve_q1():
-    # --- PATH ADJUSTMENTS ---
-    input_path = 'Images/emma.jpg'
-    output_dir = 'Images/Results'  # Subfolder inside Images
-    output_filename = 'q1_transformed_emma.jpg'
-    output_path = os.path.join(output_dir, output_filename)
+def main():
+    # 1. Setup paths relative to this script's location (Scripts folder)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    img_path = os.path.join(script_dir, '..', 'Images', 'runway.png')
+    results_dir = os.path.join(script_dir, '..', 'Images', 'Results')
     
-    # Check if the Results folder exists, if not, create it
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    # -------------------------
+    # Ensure the Results directory exists
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
 
-    # 2. Load the image in grayscale
-    img = cv2.imread(input_path, cv2.IMREAD_GRAYSCALE)
+    # 2. Load the runway image in grayscale [cite: 4, 5]
+    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     
     if img is None:
-        print(f"Error: Could not find {input_path}. Please check the folder name and filename.")
+        print(f"Error: Could not load image at {img_path}")
         return
 
-    # 3. Create the Lookup Table (LUT)
-    all_inputs = np.arange(256)
-    lut_values = np.interp(all_inputs, input_values, output_values).astype(np.uint8)
+    # 3. Normalize input pixel intensity 'r' to range [0, 1] 
+    r = img.astype(np.float32) / 255.0
 
-    # 4. Apply the transformation
-    transformed_img = cv2.LUT(img, lut_values)
+    # --- Transformation (a): Gamma correction with γ = 0.5 --- [cite: 6]
+    s_a = np.power(r, 0.5)
 
-    # 5. Save the result to the subfolder
-    cv2.imwrite(output_path, transformed_img)
-    print(f"Success! Transformed image saved as: {output_path}")
+    # --- Transformation (b): Gamma correction with γ = 2 --- [cite: 7]
+    s_b = np.power(r, 2.0)
 
-    # 6. Visualization
-    plt.figure(figsize=(12, 5))
+    # --- Transformation (c): Contrast Stretching (Piecewise Linear) --- [cite: 8]
+    # r1 = 0.2, r2 = 0.8 [cite: 11, 12]
+    r1, r2 = 0.2, 0.8
+    s_c = np.where(r < r1, 0, 
+                  np.where(r > r2, 1, 
+                  (r - r1) / (r2 - r1)))
 
-    plt.subplot(1, 3, 1)
-    plt.imshow(img, cmap='gray')
-    plt.title('Original (Emma)')
-    plt.axis('off')
+    # 4. Convert results back to 8-bit (0-255) for visualization
+    res_a = (s_a * 255).astype(np.uint8)
+    res_b = (s_b * 255).astype(np.uint8)
+    res_c = (s_c * 255).astype(np.uint8)
 
-    plt.subplot(1, 3, 2)
-    plt.plot(input_values, output_values, 'r-o', linewidth=2)
-    plt.title('Transformation Graph (Fig 1a)')
-    plt.xlabel('Input Intensity')
-    plt.ylabel('Output Intensity')
-    plt.grid(True)
+    # 5. Visualization and Saving for the Report [cite: 94, 96]
+    titles = ['Original Runway', 'Gamma=0.5', 'Gamma=2.0', 'Contrast Stretching']
+    images = [img, res_a, res_b, res_c]
 
-    plt.subplot(1, 3, 3)
-    plt.imshow(transformed_img, cmap='gray')
-    plt.title('Output Result')
-    plt.axis('off')
-
+    plt.figure(figsize=(16, 10))
+    for i in range(4):
+        plt.subplot(2, 2, i + 1)
+        plt.imshow(images[i], cmap='gray', vmin=0, vmax=255)
+        plt.title(titles[i])
+        plt.axis('off')
+    
     plt.tight_layout()
+    
+    # Save results to the folder shown in your screenshot
+    save_path = os.path.join(results_dir, 'q1_runway_transformations.png')
+    plt.savefig(save_path)
+    print(f"Successfully saved results to: {save_path}")
+    
     plt.show()
 
 if __name__ == "__main__":
-    solve_q1()
+    main()
