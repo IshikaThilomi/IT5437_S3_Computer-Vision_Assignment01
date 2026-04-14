@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 
 def get_gaussian_kernel(size, sigma):
-    # (a) Compute normalized 5x5 Gaussian kernel using NumPy [cite: 26]
+    # (a) Compute normalized 5x5 Gaussian kernel using NumPy 
     ax = np.linspace(-(size // 2), size // 2, size)
     xx, yy = np.meshgrid(ax, ax)
     kernel = np.exp(-(xx**2 + yy**2) / (2. * sigma**2))
@@ -22,7 +22,7 @@ def main():
     # (a) 5x5 Kernel
     kernel_5x5 = get_gaussian_kernel(5, 2)
     
-    # (b) 51x51 Kernel 3D Plot [cite: 27]
+    # (b) 51x51 Kernel 3D Plot 
     kernel_51x51 = get_gaussian_kernel(51, 2)
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(111, projection='3d')
@@ -31,16 +31,16 @@ def main():
     plt.title('51x51 Gaussian Kernel ($\sigma=2$)')
     plt.savefig(os.path.join(results_dir, 'q5_3d_plot.png'))
 
-    # Load and check image [cite: 28]
+    # Load and check image 
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     if img is None:
         print(f"Error: Could not find {img_path}")
         return
 
-    # (c) Manual Smoothing [cite: 28]
+    # (c) Manual Smoothing 
     manual_blur = cv2.filter2D(img, -1, kernel_5x5)
 
-    # (d) OpenCV Smoothing [cite: 29]
+    # (d) OpenCV Smoothing 
     opencv_blur = cv2.GaussianBlur(img, (5, 5), 2)
 
     # Final Comparison Plot 

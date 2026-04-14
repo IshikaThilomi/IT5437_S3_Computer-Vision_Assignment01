@@ -6,7 +6,7 @@ import os
 
 # 1. Load Image
 script_dir = os.path.dirname(os.path.abspath(__file__))
-img_path = os.path.join(script_dir, '..', 'Images', 'highlights_and_shadows.jpg') # Fig 3
+img_path = os.path.join(script_dir, '..', 'Images', 'women.png') # Fig 3
 img = cv2.imread(img_path)
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 

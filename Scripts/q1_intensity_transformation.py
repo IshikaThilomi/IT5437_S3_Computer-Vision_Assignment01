@@ -14,7 +14,7 @@ def main():
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
 
-    # 2. Load the runway image in grayscale [cite: 4, 5]
+    # 2. Load the runway image in grayscale 
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     
     if img is None:
@@ -24,13 +24,13 @@ def main():
     # 3. Normalize input pixel intensity 'r' to range [0, 1] 
     r = img.astype(np.float32) / 255.0
 
-    # --- Transformation (a): Gamma correction with γ = 0.5 --- [cite: 6]
+    # --- Transformation (a): Gamma correction with γ = 0.5 
     s_a = np.power(r, 0.5)
 
-    # --- Transformation (b): Gamma correction with γ = 2 --- [cite: 7]
+    # --- Transformation (b): Gamma correction with γ = 2 
     s_b = np.power(r, 2.0)
 
-    # --- Transformation (c): Contrast Stretching (Piecewise Linear) --- [cite: 8]
+    # --- Transformation (c): Contrast Stretching (Piecewise Linear)
     # r1 = 0.2, r2 = 0.8 [cite: 11, 12]
     r1, r2 = 0.2, 0.8
     s_c = np.where(r < r1, 0, 
@@ -42,7 +42,7 @@ def main():
     res_b = (s_b * 255).astype(np.uint8)
     res_c = (s_c * 255).astype(np.uint8)
 
-    # 5. Visualization and Saving for the Report [cite: 94, 96]
+    # 5. Visualization and Saving for the Report 
     titles = ['Original Runway', 'Gamma=0.5', 'Gamma=2.0', 'Contrast Stretching']
     images = [img, res_a, res_b, res_c]
 
